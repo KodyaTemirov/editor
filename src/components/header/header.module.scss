@@ -1,0 +1,6 @@
+.header {
+  @apply shadow-sm h-14 flex justify-between items-center gap-4 w-full px-4;
+} 
+.right {
+  @apply flex gap-4;
+}

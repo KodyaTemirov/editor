@@ -1,0 +1,6 @@
+.input {
+  @apply h-9 rounded-md px-4 flex items-center text-sm font-semibold text-gray-400;
+  &:focus {
+    @apply outline-none;
+  }
+} 
