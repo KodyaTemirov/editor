@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react'
+import React, { ChangeEvent, FC, useMemo, useState } from 'react'
 import { createEditor, Node } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import {
@@ -7,7 +7,8 @@ import {
   Button,
   Input,
   NoteCard,
-  NotSelected
+  NotSelected,
+  ModalBox
 } from '../components'
 
 interface Notes {
@@ -18,12 +19,14 @@ interface Notes {
   text: Node[]
 }
 export interface EditorLayoutProps {
-  notes?: Notes[]
+  notes: Notes[]
 }
 
 const EditorLayout: FC<EditorLayoutProps> = ({ notes }) => {
   const [data, setData] = React.useState(notes)
   const [edit, setEdit] = React.useState(true)
+  const [modalBox, setModalBox] = React.useState(false)
+  const [searchValue, setSearchValue] = React.useState('')
 
   // Выбор заметки
   const selectNoteHandler = (id: string) => {
@@ -66,16 +69,38 @@ const EditorLayout: FC<EditorLayoutProps> = ({ notes }) => {
     setData(updateValue)
   }
 
-  const editHandler = () => {
+  const editHandler = (): void => {
     setEdit(!edit)
   }
 
+  const deleteHandler = (): void => {
+    const notes = data.filter(note => note.id !== selectedNote.id)
+    setData(notes)
+    setModalBox(false)
+  }
+
+  const onChangeSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value)
+    console.log(searchValue)
+  }
+
+  const filterNotes = (notes: Notes[]): Notes[] => {
+    return data.filter((note: Notes) =>
+      note.title.toLowerCase().includes(searchValue.toLowerCase())
+    )
+  }
+
   return (
-    <div className='flex w-full h-screen'>
+    <div className='flex w-full h-screen fixed'>
       <Sidebar>
-        <Input placeholder='Поиск' className='w-full' />
+        <Input
+          placeholder='Поиск'
+          className='w-full'
+          label={searchValue}
+          onChange={onChangeSearch}
+        />
         <ul className='flex gap-4 flex-col'>
-          {notes?.map(({ title, date, id }) => {
+          {filterNotes(data).map(({ title, date, id }) => {
             return (
               <NoteCard
                 title={title}
@@ -88,27 +113,42 @@ const EditorLayout: FC<EditorLayoutProps> = ({ notes }) => {
           })}
         </ul>
       </Sidebar>
-      <section className='w-full h-screen flex-col flex ml-80'>
+
+      <section className='w-full h-screen flex-col flex'>
         {selectedNote !== undefined ? (
           <div className='flex flex-col'>
             <Header title={selectedTitle}>
-              <div className='flex gap-4'>
-                <Button
-                  label={edit ? 'Редактировать' : 'Читать'}
-                  className='bg-blue-700 hover:bg-blue-600'
-                  onClick={editHandler}
-                />
-                <Button
-                  label='Удалить'
-                  className='bg-red-700 hover:bg-red-600'
-                />
-              </div>
+              <Button
+                label={edit ? 'Редактировать' : 'Читать'}
+                className='bg-blue-700 hover:bg-blue-600'
+                onClick={editHandler}
+              />
+              <Button
+                label='Удалить'
+                className='bg-red-700 hover:bg-red-600'
+                onClick={() => setModalBox(!modalBox)}
+              />
             </Header>
             <div className='p-4'>
               <Slate editor={editor} value={value} onChange={onChangeEditor}>
                 <Editable readOnly={edit} />
               </Slate>
             </div>
+            <ModalBox
+              label='Вы точно хотите удалить заметку?'
+              active={modalBox}
+            >
+              <Button
+                label='Удалить'
+                className='bg-red-700 hover:bg-red-600'
+                onClick={deleteHandler}
+              />
+              <Button
+                label='Отменить'
+                className='bg-green-700 hover:bg-green-600'
+                onClick={() => setModalBox(!modalBox)}
+              />
+            </ModalBox>
           </div>
         ) : (
           <NotSelected />
@@ -117,63 +157,5 @@ const EditorLayout: FC<EditorLayoutProps> = ({ notes }) => {
     </div>
   )
 }
-EditorLayout.defaultProps = {
-  notes: [
-    {
-      selected: false,
-
-      id: '1',
-      title: 'О Канте',
-      date: '18.03.2021',
-      text: [
-        {
-          type: 'paragraph',
-          children: [
-            {
-              text:
-                'Канте - лучший игрок матча по мнению фанатов «Челси»! У нас в телеге тоже практически единогласно 😎'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      selected: false,
-
-      id: '2',
-      title:
-        '«Атлетико» официально объявил о разрыве контракта с  Диего Симеоне',
-      date: '18.03.2021',
-      text: [
-        {
-          type: 'paragraph',
-          children: [
-            {
-              text:
-                'Это самый высокий показатель за все время сдачи тестов. На второй неделе ноября было 16, на первой неделе декабря 14. В остальные периоды фиксировалось не более 10 новых случаев. '
-            }
-          ]
-        }
-      ]
-    },
-    {
-      selected: false,
-      id: '3',
-      title:
-        'Пресс-конференция Рюдигера перед матчем с «Атлетико». Основные вехи:',
-      date: '18.03.2021',
-      text: [
-        {
-          type: 'paragraph',
-          children: [
-            {
-              text:
-                'С августа 2019 года только у Серхио Агуэро уходило меньше минут на гол (94), чем у Оливье Жиру (105).'
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
+EditorLayout.defaultProps = {}
 export default EditorLayout

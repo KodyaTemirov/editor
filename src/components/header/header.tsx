@@ -9,8 +9,8 @@ const Header: FC<HeaderProps> = ({
 }) => {
   return (
     <header className={s.header}>
-      <h4 className='text-gray-800 font-semibold'>{title}</h4>
-      {children}
+      <h4 className={s.title}>{title}</h4>
+      <div className={s.right}>{children}</div>
     </header>
   )
 }

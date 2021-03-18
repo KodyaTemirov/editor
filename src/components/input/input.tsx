@@ -1,10 +1,10 @@
-import React, { FC } from 'react'
+import React, { ChangeEvent, FC } from 'react'
 import s from './input.module.scss'
 import clsx from 'clsx'
 export interface ButtonProps {
   label?: string
   className?: string
-  onChange?: () => void
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => void
   placeholder?: string
 }
 
