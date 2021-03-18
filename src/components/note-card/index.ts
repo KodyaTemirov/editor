@@ -1,2 +1,2 @@
 import NoteCard from './note-card'
-export { NoteCard }
+export default NoteCard 

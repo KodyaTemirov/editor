@@ -1,6 +1,6 @@
-import Editor from './pages/editor-layout'
+import EditorLayout from './pages/editor-layout'
 function App () {
-  return <Editor />
+  return <EditorLayout />
 }
 
 export default App

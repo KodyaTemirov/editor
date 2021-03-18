@@ -9,7 +9,7 @@ export interface NoteCardProps {
 const NoteCard: FC<NoteCardProps> = ({ id, date, title, onClick }) => {
   return (
     <li className={s.noteCard} key={id} onClick={onClick}>
-      <h6 className='text-gray-800 font-semibold text-md'>{title}</h6>
+      <h6 className={s.title}>{title}</h6>
       <span className='text-gray-600 text-sm'>{date}</span>
     </li>
   )
